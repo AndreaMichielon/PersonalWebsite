@@ -532,6 +532,16 @@
                 }
             }, false);
 
+            window.addEventListener('touchstart', onDocumentTouchStart, { passive: true });
+            window.addEventListener('touchmove', onDocumentTouchMove, { passive: false });
+            window.addEventListener('touchend', onDocumentTouchEnd, { passive: true });
+
+            // Scroll listener for mobile rotation
+            window.addEventListener('scroll', onDocumentScroll, { passive: true });
+
+            // Tap listener for 360 rotation on mobile
+            container.addEventListener('touchstart', onDocumentTap, { passive: true });
+
             window.addEventListener('resize', onWindowResize, false);
             
             // Add spin listeners for all interactive elements
@@ -600,6 +610,80 @@
                 // Apply rotation with your desired offset and sensitivity
                 targetRotation.x = mouseY * 0.2 - 0.45; // Look slightly down + mouse influence
                 targetRotation.y = mouseX * 0.15 + 0.32; // Look slightly left + mouse influence
+            }
+        }
+
+        // Mobile touch support
+        var lastTouchX = 0;
+        var lastTouchY = 0;
+        var scrollInfluence = { x: 0, y: 0 };
+
+        // Touch event handlers for mobile
+        function onDocumentTouchStart(event) {
+            if (event.touches.length === 1) {
+                lastTouchX = event.touches[0].clientX;
+                lastTouchY = event.touches[0].clientY;
+            }
+        }
+
+        function onDocumentTouchMove(event) {
+            if (!isRotating && model && event.touches.length === 1) {
+                var touch = event.touches[0];
+                
+                // Get the model container's position and dimensions
+                var containerRect = container.getBoundingClientRect();
+                var containerCenterX = containerRect.left + containerRect.width / 2;
+                var containerCenterY = containerRect.top + containerRect.height / 2;
+                
+                // Calculate touch position relative to container center
+                var touchX = (touch.clientX - containerCenterX) / (containerRect.width / 2);
+                var touchY = (touch.clientY - containerCenterY) / (containerRect.height / 2);
+                
+                // Apply rotation similar to mouse movement
+                targetRotation.x = touchY * 0.2 - 0.45;
+                targetRotation.y = touchX * 0.15 + 0.32;
+            }
+        }
+
+        function onDocumentTouchEnd(event) {
+            // Smooth return to base position when touch ends
+            setTimeout(() => {
+                if (!isRotating) {
+                    targetRotation.x = -0.45; // Base X position
+                    targetRotation.y = 0.32;  // Base Y position
+                }
+            }, 500);
+        }
+
+        // Improved scroll-based rotation for mobile
+        function onDocumentScroll() {
+            if (!isRotating && model) {
+                var currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
+                var scrollDelta = (currentScrollY % 1000) / 1000; // Normalize scroll position
+                
+                // Create subtle oscillation based on scroll position
+                scrollInfluence.x = Math.sin(scrollDelta * Math.PI * 2) * 0.1;
+                scrollInfluence.y = Math.cos(scrollDelta * Math.PI * 2) * 0.1;
+                
+                // Add scroll influence to base rotation (don't override)
+                targetRotation.x = -0.45 + scrollInfluence.x;
+                targetRotation.y = 0.32 + scrollInfluence.y;
+            }
+        }
+
+        // Tap gesture for 360 rotation (mobile)
+        function onDocumentTap(event) {
+            if (model && !isRotating && event.touches.length === 1) {
+                var containerRect = container.getBoundingClientRect();
+                var touch = event.touches[0];
+                
+                // Check if tap is within the model container
+                if (touch.clientX >= containerRect.left && 
+                    touch.clientX <= containerRect.right &&
+                    touch.clientY >= containerRect.top && 
+                    touch.clientY <= containerRect.bottom) {
+                    do360Rotation();
+                }
             }
         }
 
