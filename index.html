@@ -1,179 +1,696 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8" />
     <title>Spineless</title>
     <link rel="icon" type="image/png" href="static/png/s.png">
     <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: Arial, sans-serif;
-      font-size: 14px;
-      background-color: #000000;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    #container {
-      position: absolute;
-      width: 50%;
-      height: 100%;
-    }
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
 
-    #text {
-      position: absolute;
-      width: 50%;
-      height: 100%;
-      right: 0;
-      top: 0;
-      padding: 20px;
-      box-sizing: border-box;
-      color: #ffffff;
-      font-size: 18px;
-      line-height: 0.5;
-      margin: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-end;
-      padding-right: 50px;
-    }
+        /* Fixed Header */
+        #header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            z-index: 10;
+            background: #000;
+            border-bottom: 4px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+        }
 
-    h1, p, ul {
-      margin-top: 0;
-      margin-right: 20px;
-      text-align: right;
-    }
+        #name-section {
+            flex: 1;
+            text-align: left;
+        }
 
-    #footer {
-        position: absolute;
-        bottom: 0;
-        width: 100%;
-        height: 50px;
-        background-color: #000000;
-        color: #ffffff;
-        text-align: center;
-        font-size: 12px;
-        line-height: 50px;
-        margin-bottom: 15px;
-      }
+        #name-section h1 {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
 
-      #footer a {
-        color: #ffffff;
-        text-decoration: none;
-      }
+        #name-section .subtitle {
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            opacity: 0.8;
+            line-height: 1.4;
+        }
 
-      #footer a:hover {
-        text-decoration: underline;
-      }
+        #model-container {
+            width: 300px;
+            height: 180px;
+            cursor: pointer;
+        }
 
-      .icon {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 999;
-      }
+        /* Main Content */
+        #main-content {
+            margin-top: 200px;
+            position: relative;
+            z-index: 5;
+            background: #000;
+        }
+
+        .section {
+            min-height: 60vh;
+            padding: 4rem 5%;
+            border-top: 4px solid #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section:first-child {
+            min-height: 40vh;
+        }
+
+        .section h2 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 3rem;
+            letter-spacing: -1px;
+        }
+
+        /* CV Section */
+        .cv-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cv-button {
+            background: #fff;
+            color: #000;
+            padding: 2rem 3rem;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: 4px solid #fff;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .cv-button:hover {
+            background: #000;
+            color: #fff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
+        }
+
+        /* Publications Section */
+        .publications-content {
+            text-align: center;
+        }
+
+        .research-link {
+            display: inline-block;
+            background: transparent;
+            color: #fff;
+            padding: 2rem 4rem;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.5rem;
+            border: 4px solid #fff;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            margin: 2rem 0;
+        }
+
+        .research-link:hover {
+            background: #fff;
+            color: #000;
+            transform: scale(1.05);
+        }
+
+        /* Art Section */
+        .art-content {
+            text-align: center;
+        }
+
+        .art-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .art-item {
+            aspect-ratio: 1;
+            background: #333;
+            border: 4px solid #fff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .art-item:hover {
+            transform: rotate(2deg) scale(1.05);
+            border-color: #ff69b4;
+        }
+
+        /* Instagram embeds - force square */
+        .art-item .instagram-media {
+            width: 100% !important;
+            height: 100% !important;
+            min-width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        .art-item iframe {
+            width: 100% !important;
+            height: 100% !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+
+        /* Instagram Button */
+        .instagram-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: #fff;
+            padding: 2rem 3rem;
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            border: 4px solid #ff69b4;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .instagram-button:hover {
+            background: #000;
+            color: #ff69b4;
+            transform: translateY(-5px) skew(-2deg);
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
+        }
+
+        /* Music Section */
+        .music-content {
+            text-align: center;
+        }
+
+        .spotify-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .spotify-item {
+            /* Remove all the background/border styling, keep just: */
+            transition: transform 0.3s ease;
+        }
+
+        .spotify-item:hover {
+            transform: translateY(-5px); /* Just a subtle lift */
+        }
+
+        .spotify-item iframe {
+            width: 100%;
+            height: 152px;
+            border: none;
+        }
+
+        /* Footer */
+        #footer {
+            background: #fff;
+            color: #000;
+            padding: 2rem;
+            text-align: center;
+            font-weight: 900;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #footer-text {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.9);
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            opacity: 0; /* Start hidden */
+            transform: translateX(-40px);
+        }
+
+        #footer-icon {
+            position: absolute;
+            top: 50%;
+            left: -120px;
+            transform: translateY(-50%);
+            width: 80px; 
+            height: 56px;
+            background-image: url('static/png/s.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 3;
+        }
+
+        /* Animation keyframes */
+        @keyframes iconSwipe {
+            0% {
+                left: -120px;
+                transform: translateY(-50%) rotate(0deg);
+            }
+            70% {
+                left: calc(50% + 250px); /* Moved further right */
+                transform: translateY(-50%) rotate(360deg);
+            }
+            100% {
+                left: calc(50% + 280px); /* Moved further right */
+                transform: translateY(-50%) rotate(360deg);
+            }
+        }
+
+        @keyframes textReveal {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            60% { /* Longer delay before text appears */
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Apply animations directly when footer comes into view */
+        #footer.animate-footer #footer-icon {
+            animation: iconSwipe 4s ease-in-out forwards;
+        }
+
+        #footer.animate-footer #footer-text {
+            animation: textReveal 4s ease-in-out forwards;
+        }
+
+        @media (max-width: 768px) {
+            #header {
+                height: 150px;
+                padding: 0 2%;
+            }
+            
+            #model-container {
+                width: 200px;
+                height: 120px;
+            }
+            
+            #main-content {
+                margin-top: 150px;
+            }
+            
+            .cv-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .cv-button {
+                min-width: 80%;
+            }
+
+            .art-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .spotify-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .scroll-indicator {
+            display: none;
+        }
     </style>
-  </head>
-  <body>
-    <div id="container"></div>
-    <div id="text">
-      <h1>Andrea Michielon</h1>
-      <p>ICT Engineering Master's Degree at UniPd</p>
-      <p>CV & AI Software Developer</p>
-      <p>Graphic Designer</p>
-      <div id="links" style="padding-right: 20px;">
-      <a href="static/pdf/CV_Andrea_Michielon_ENG.pdf" download>CV(english)</a>
-      <a href="static/pdf/CV_Andrea_Michielon_ITA.pdf" download>CV(italiano)</a>
-      <a href="mailto:andrea.michielon97@gmail.com">Mail</a>
-      <a href="https://www.instagram.com/spineless_inc/">Art</a>
-      </div>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <div id="header">
+        <div id="name-section">
+            <h1>Andrea Michielon</h1>
+            <div class="subtitle">
+                ICT Engineering Master's Degree at UniPd<br>
+                CV & AI Software Developer<br>
+                Graphic Designer
+            </div>
+        </div>
+        <div id="model-container"></div>
     </div>
+
+    <!-- Main Content -->
+    <div id="main-content">
+        <!-- CV Section -->
+        <section class="section">
+            <h2>About Me</h2>
+            <div class="cv-buttons">
+                <a href="static/pdf/CV_Andrea_Michielon_ENG.pdf" download class="cv-button">
+                    CV [eng]
+                </a>
+                <a href="static/pdf/CV_Andrea_Michielon_ITA.pdf" download class="cv-button">
+                    CV [ita]
+                </a>
+                <a href="mailto:andrea.michielon97@gmail.com" class="cv-button">
+                    MAIL
+                </a>
+            </div>
+        </section>
+
+        <!-- Publications Section -->
+        <section class="section">
+            <h2>Publications</h2>
+            <div class="publications-content">
+                <a href="https://orcid.org/0009-0008-2502-9818" class="research-link">View Research Papers</a>
+            </div>
+        </section>
+
+        <!-- Art Section -->
+        <section class="section">
+            <h2>Visuals</h2>
+            <div class="art-content">
+                <div class="art-grid">
+                    <div class="art-item">
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/Ct4vmOPt0Zo/?img_index=1" data-instgrm-version="14">
+                        </blockquote>
+                    </div>
+                    <div class="art-item">
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/C4uiTqgN5NY/?img_index=1" data-instgrm-version="14">
+                        </blockquote>
+                    </div>
+                    <div class="art-item">
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/DIY8UQqNXsS/?img_index=4" data-instgrm-version="14">
+                        </blockquote>
+                    </div>
+                    <div class="art-item">
+                        <blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/BNxSIlZBOqe/?img_index=1" data-instgrm-version="14">
+                        </blockquote>
+                    </div>                    
+                </div>
+                
+                <!-- Instagram Button below the grid -->
+                <a href="https://www.instagram.com/spineless_inc/" class="instagram-button" target="_blank">
+                    Follow @spineless_inc
+                </a>
+            </div>
+        </section>
+
+        <!-- Music Section -->
+        <section class="section">
+            <h2>Now playing</h2>
+            <div class="music-content">
+                <div class="spotify-grid">
+                    <div class="spotify-item">
+                        <iframe src="https://open.spotify.com/embed/track/3f27mtLKBWGcGC5VXbMNji" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy"></iframe>
+                    </div>
+
+                    <div class="spotify-item">
+                        <iframe src="https://open.spotify.com/embed/track/0yYFkxXwuGOggxrIs9cy8l" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy"></iframe>
+                    </div>
+
+                    <div class="spotify-item">
+                        <iframe src="https://open.spotify.com/embed/track/0Gf4mnNJzkTj0ZT6piQY9R" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy"></iframe>
+                    </div>
+
+                    <div class="spotify-item">
+                        <iframe src="https://open.spotify.com/embed/track/3zSBsvj6MWavRKfPE51395" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy"></iframe>
+                    </div>
+
+                    <div class="spotify-item">
+                        <iframe src="https://open.spotify.com/embed/track/6bGDr2wSAAuVvVWhMzax7w" 
+                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
+
+    <!-- Footer -->
+    <div id="footer">
+        <div id="footer-icon"></div>
+        <div id="footer-text">
+            Spineless personal website. All rights reserved, I guess...
+        </div>
+    </div>
+
+    <script async src="//www.instagram.com/embed.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.131.2/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.131.2/examples/js/controls/OrbitControls.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.131.2/examples/js/loaders/MTLLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.131.2/examples/js/loaders/OBJLoader.js"></script>
     <script>
-      var container = document.getElementById('container');
-      var camera, scene, renderer, controls;
-      var model;
+        var container = document.getElementById('model-container');
+        var camera, scene, renderer;
+        var model;
+        var isRotating = false;
+        var targetRotation = { x: 0, y: 0 };
+        var currentRotation = { x: 0, y: 0 };
 
-      init();
-      animate();
+        init();
+        animate();
 
-      function init() {
-          camera = new THREE.PerspectiveCamera(45, container.offsetWidth / container.offsetHeight, 1, 1000);
-          camera.position.z = 2;
+        function init() {
+            camera = new THREE.PerspectiveCamera(45, container.offsetWidth / container.offsetHeight, 1, 1000);
+            camera.position.z = 2;
 
-          scene = new THREE.Scene();
-          scene.background = new THREE.Color(0xcccccc);
-          scene.add(new THREE.AmbientLight(0xffffff, 0.25));
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
-          var light = new THREE.PointLight(0xffffff, 0.35);
-          camera.add(light);
-          scene.add(camera);
+            var light = new THREE.PointLight(0xffffff, 0.4);
+            camera.add(light);
+            scene.add(camera);
 
-          var manager = new THREE.LoadingManager();
-          manager.onProgress = function (item, loaded, total) {
-              console.log(item, loaded, total);
-          };
+            var manager = new THREE.LoadingManager();
+            manager.onProgress = function (item, loaded, total) {
+                console.log(item, loaded, total);
+            };
 
-          var mtlLoader = new THREE.MTLLoader(manager);
-          mtlLoader.setPath('static/models/');
-          mtlLoader.load('HEAD.mtl', function (materials) {
-              materials.preload();
-              var objLoader = new THREE.OBJLoader(manager);
-              objLoader.setMaterials(materials);
-              objLoader.setPath('static/models/');
-              objLoader.load('HEAD.obj', function (object) {
-                  model = object;
-                  model.position.set(0, 0, 0); // set the position of the model
-                  scene.add(model);
-                  scene.background = new THREE.Color(0x000000);
-              });
-          });
+            var mtlLoader = new THREE.MTLLoader(manager);
+            mtlLoader.setPath('static/models/');
+            mtlLoader.load('HEAD.mtl', function (materials) {
+                materials.preload();
+                var objLoader = new THREE.OBJLoader(manager);
+                objLoader.setMaterials(materials);
+                objLoader.setPath('static/models/');
+                objLoader.load('HEAD.obj', function (object) {
+                    model = object;
+                    model.position.set(0, 0, 0);
+                    scene.add(model);
+                });
+            });
 
-          renderer = new THREE.WebGLRenderer();
-          renderer.setSize(window.innerWidth / 2, window.innerHeight);
-          renderer.setClearColor(0x000000);
-          container.appendChild(renderer.domElement);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            renderer.setClearColor(0x000000);
+            container.appendChild(renderer.domElement);
 
-          controls = new THREE.OrbitControls(camera, renderer.domElement);
-          controls.update();
+            // Mouse movement listener
+            window.addEventListener('mousemove', onDocumentMouseMove, false);
+            
+            // Click listener for 360 rotation
+            container.addEventListener('click', function() {
+                if (model && !isRotating) {
+                    do360Rotation();
+                }
+            }, false);
 
-          window.addEventListener('mousemove', onDocumentMouseMove, false); // listen to the mouse movement on the whole webpage
-          window.addEventListener('resize', onWindowResize, false);
-      }
+            window.addEventListener('resize', onWindowResize, false);
+            
+            // Add spin listeners for all interactive elements
+            addSpinListeners();
+        }
 
-      function onDocumentMouseMove(event) {
-          event.preventDefault();
-          var mouseX = (event.clientX - window.innerWidth / 2) / 1000;
-          var mouseY = (event.clientY - window.innerHeight / 2) / 1000;
-          if (model) { // check if the model is loaded
-              model.rotation.x = mouseY;
-              model.rotation.y = mouseX;
-          }
-      }
+        function addSpinListeners() {
+            // CV buttons
+            document.querySelectorAll('.cv-button').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    if (model && !isRotating) {
+                        do360Rotation();
+                    }
+                });
+            });
+            
+            // Research link
+            document.querySelectorAll('.research-link').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (model && !isRotating) {
+                        do360Rotation();
+                    }
+                });
+            });
+            
+            // Instagram button
+            document.querySelectorAll('.instagram-button').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    if (model && !isRotating) {
+                        do360Rotation();
+                    }
+                });
+            });
+            
+            // Art items
+            document.querySelectorAll('.art-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    if (model && !isRotating) {
+                        do360Rotation();
+                    }
+                });
+            });
+            
+            // Spotify items
+            document.querySelectorAll('.spotify-item').forEach(function(item) {
+                item.addEventListener('click', function() {
+                    if (model && !isRotating) {
+                        do360Rotation();
+                    }
+                });
+            });
+        }
 
-      function onWindowResize() {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth / 2, window.innerHeight);
-      }
+        function onDocumentMouseMove(event) {
+            if (!isRotating && model) {
+                // Get the model container's position and dimensions
+                var containerRect = container.getBoundingClientRect();
+                var containerCenterX = containerRect.left + containerRect.width / 2;
+                var containerCenterY = containerRect.top + containerRect.height / 2;
+                
+                // Calculate mouse position relative to container center
+                // Normalize to -1 to 1 range based on container size
+                var mouseX = (event.clientX - containerCenterX) / (containerRect.width / 2);
+                var mouseY = (event.clientY - containerCenterY) / (containerRect.height / 2);
+                
+                // Apply rotation with your desired offset and sensitivity
+                targetRotation.x = mouseY * 0.2 - 0.45; // Look slightly down + mouse influence
+                targetRotation.y = mouseX * 0.15 + 0.32; // Look slightly left + mouse influence
+            }
+        }
 
-      function animate() {
-          requestAnimationFrame(animate);
-          controls.update();
-          renderer.render(scene, camera);
-      }
+        function do360Rotation() {
+            isRotating = true;
+            var startTime = Date.now();
+            var duration = Math.floor(Math.random() * (2000 - 100 + 1)) + 100;
+            var startRotationY = model.rotation.y;
+            var targetRotationY = startRotationY + Math.PI * 2; // 360 degrees
+
+            function rotateStep() {
+                var elapsed = Date.now() - startTime;
+                var progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function
+                var easeProgress = 1 - Math.pow(1 - progress, 3);
+                
+                model.rotation.y = startRotationY + (targetRotationY - startRotationY) * easeProgress;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(rotateStep);
+                } else {
+                    isRotating = false;
+                }
+            }
+            
+            rotateStep();
+        }
+
+        function onWindowResize() {
+            camera.aspect = container.offsetWidth / container.offsetHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (model && !isRotating) {
+                // Smooth interpolation to target rotation
+                currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
+                currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
+                
+                model.rotation.x = currentRotation.x;
+                model.rotation.y = currentRotation.y;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // Scroll trigger for footer animation with retriggering
+        function checkFooterInView() {
+            const footer = document.getElementById('footer');
+            const rect = footer.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+            
+            // Check if footer is visible (top of footer is within viewport)
+            const isVisible = rect.top <= windowHeight && rect.bottom >= 0;
+            
+            if (isVisible && !footer.classList.contains('animate-footer')) {
+                // Footer came into view - start animation
+                footer.classList.add('animate-footer');
+                console.log('Footer animation triggered!');
+            } else if (!isVisible && footer.classList.contains('animate-footer')) {
+                // Footer went out of view - reset for next time
+                footer.classList.remove('animate-footer');
+                
+                // Reset the icon and text to initial state
+                const footerIcon = document.getElementById('footer-icon');
+                const footerText = document.getElementById('footer-text');
+                
+                // Force reset by removing and re-adding the elements
+                footerIcon.style.animation = 'none';
+                footerText.style.animation = 'none';
+                
+                // Use setTimeout to ensure the reset takes effect
+                setTimeout(() => {
+                    footerIcon.style.animation = '';
+                    footerText.style.animation = '';
+                }, 10);
+                
+                console.log('Footer animation reset!');
+            }
+        }
+
+        // Add event listeners
+        window.addEventListener('scroll', checkFooterInView);
+        window.addEventListener('load', checkFooterInView);
+
+        // Also try triggering after a small delay on load
+        setTimeout(checkFooterInView, 500);
     </script>
-    <div id="footer">
-      Spineless personal website. All rights reserved, I guess...
-    </div>
-    <div class="icon">
-      <img src="static/png/s.png" width="45" height="32">>
-    </div>
 </body>
 </html>
