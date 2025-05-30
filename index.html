@@ -198,15 +198,25 @@
             display: none; /* Hidden by default */
         }
 
+        .scroll-arrow::before {
+            content: '';
+            position: absolute;
+            top: -25px;
+            left: -25px;
+            width: 50px;
+            height: 50px;
+            /* Invisible larger touch target */
+        }
+
         .scroll-arrow-left {
-            left: 20px;
+            left: 10px;
             border-top: 15px solid transparent;
             border-bottom: 15px solid transparent;
             border-right: 20px solid rgba(255, 255, 255, 0.7);
         }
 
         .scroll-arrow-right {
-            right: 20px;
+            right: 10px;
             border-top: 15px solid transparent;
             border-bottom: 15px solid transparent;
             border-left: 20px solid rgba(255, 255, 255, 0.7);
@@ -214,6 +224,28 @@
 
         .scroll-arrow:hover {
             opacity: 1 !important;
+        }
+
+        /* Mobile improvements for arrows - larger but invisible touch targets */
+        @media (max-width: 768px) {
+            .scroll-arrow::before {
+                top: -35px;
+                left: -35px;
+                width: 70px;
+                height: 70px;
+            }
+            
+            .scroll-arrow-left {
+                border-top: 18px solid transparent;
+                border-bottom: 18px solid transparent;
+                border-right: 24px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .scroll-arrow-right {
+                border-top: 18px solid transparent;
+                border-bottom: 18px solid transparent;
+                border-left: 24px solid rgba(255, 255, 255, 0.8);
+            }
         }
 
         /* Show arrows when parent has overflow */
@@ -225,6 +257,10 @@
         .art-content.has-overflow:hover .scroll-arrow,
         .music-content.has-overflow:hover .scroll-arrow {
             opacity: 0.7;
+        } /* Hide overflow for auto-scroll */
+            gap: 2rem;
+            margin: 3rem 0;
+            white-space: nowrap;
         }
 
         .art-item {
@@ -255,7 +291,7 @@
             border: none !important;
             border-radius: 0 !important;
             position: absolute !important;
-            top: -22% !important;
+            top: -22% !important; /* Big screens - 17% */
             left: 0 !important;
         }
 
@@ -454,10 +490,10 @@
 
             /* Small screens - 30% crop */
             .art-item .instagram-media {
-                top: -26% !important;
+                top: -30% !important;
             }
             .art-item iframe {
-                top: -26% !important;
+                top: -30% !important;
             }
 
             /* Adjust sizing for mobile */
@@ -662,6 +698,9 @@
                 window.addEventListener('mousemove', onDocumentMouseMove, false);
             }
             
+            // Add scroll listener for 3D model interaction
+            window.addEventListener('scroll', onScroll, { passive: true });
+            
             // Click listener for 360 rotation
             container.addEventListener('click', function(e) {
                 if (model && !isRotating) {
@@ -670,7 +709,7 @@
                 }
             }, false);
 
-            // Simplified touch handlers
+            // Enhanced touch handlers
             container.addEventListener('touchstart', onTouchStart, { passive: false });
             container.addEventListener('touchmove', onTouchMove, { passive: false });
             container.addEventListener('touchend', onTouchEnd, { passive: false });
@@ -744,11 +783,34 @@
             }
         }
 
-        // Simplified touch handlers
+        // Enhanced touch handlers for better responsiveness
         function onTouchStart(event) {
             if (event.touches.length === 1) {
                 lastTouchTime = Date.now();
-                event.preventDefault(); // Prevent scrolling when touching the model
+                
+                var touch = event.touches[0];
+                var containerRect = container.getBoundingClientRect();
+                
+                // Check if touch is within container
+                if (touch.clientX >= containerRect.left && 
+                    touch.clientX <= containerRect.right &&
+                    touch.clientY >= containerRect.top && 
+                    touch.clientY <= containerRect.bottom) {
+                    
+                    event.preventDefault(); // Prevent scrolling when touching the model
+                    
+                    // Immediately update rotation based on touch position
+                    var containerCenterX = containerRect.left + containerRect.width / 2;
+                    var containerCenterY = containerRect.top + containerRect.height / 2;
+                    
+                    var touchX = (touch.clientX - containerCenterX) / (containerRect.width / 2);
+                    var touchY = (touch.clientY - containerCenterY) / (containerRect.height / 2);
+                    
+                    mouseInfluence.x = touchY * 0.2;
+                    mouseInfluence.y = touchX * 0.15;
+                    
+                    updateTargetRotation();
+                }
             }
         }
 
@@ -787,15 +849,43 @@
                 do360Rotation();
             }
             
-            // Reset mouse influence
-            mouseInfluence.x = 0;
-            mouseInfluence.y = 0;
-            updateTargetRotation();
+            // Smooth return to base position when touch ends
+            setTimeout(() => {
+                if (!isRotating) {
+                    mouseInfluence.x = 0;
+                    mouseInfluence.y = 0;
+                    updateTargetRotation();
+                }
+            }, 100);
+        }
+
+        // Add scroll-based interaction for 3D model
+        function onScroll() {
+            if (!isRotating && model) {
+                var containerRect = container.getBoundingClientRect();
+                var windowHeight = window.innerHeight;
+                var containerTop = containerRect.top;
+                var containerHeight = containerRect.height;
+                
+                // Check if container is in viewport
+                if (containerTop < windowHeight && containerTop + containerHeight > 0) {
+                    // Calculate scroll influence based on container position
+                    var scrollProgress = Math.max(0, Math.min(1, (windowHeight - containerTop) / (windowHeight + containerHeight)));
+                    var scrollInfluence = (scrollProgress - 0.5) * 0.3;
+                    
+                    // Apply subtle rotation based on scroll position
+                    targetRotation.x = -0.45 + scrollInfluence + mouseInfluence.x;
+                    targetRotation.y = 0.32 + scrollInfluence * 0.5 + mouseInfluence.y;
+                }
+            }
         }
 
         function updateTargetRotation() {
-            targetRotation.x = -0.45 + mouseInfluence.x;
-            targetRotation.y = 0.32 + mouseInfluence.y;
+            // Only update if not using scroll influence
+            if (!window.scrollY || mouseInfluence.x !== 0 || mouseInfluence.y !== 0) {
+                targetRotation.x = -0.45 + mouseInfluence.x;
+                targetRotation.y = 0.32 + mouseInfluence.y;
+            }
         }
 
         function do360Rotation() {
@@ -902,7 +992,7 @@
             }
         }
 
-        // Create clickable arrow elements
+        // Create clickable arrow elements with scroll bounds
         function createScrollArrows() {
             // Art section arrows
             const artContent = document.querySelector('.art-content');
@@ -911,13 +1001,16 @@
             const artLeftArrow = document.createElement('div');
             artLeftArrow.className = 'scroll-arrow scroll-arrow-left art-arrow-left';
             artLeftArrow.addEventListener('click', () => {
-                artGrid.scrollBy({ left: -300, behavior: 'smooth' });
+                const newScrollLeft = Math.max(0, artGrid.scrollLeft - 300);
+                artGrid.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
             });
             
             const artRightArrow = document.createElement('div');
             artRightArrow.className = 'scroll-arrow scroll-arrow-right art-arrow-right';
             artRightArrow.addEventListener('click', () => {
-                artGrid.scrollBy({ left: 300, behavior: 'smooth' });
+                const maxScroll = artGrid.scrollWidth - artGrid.clientWidth;
+                const newScrollLeft = Math.min(maxScroll, artGrid.scrollLeft + 300);
+                artGrid.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
             });
             
             artContent.appendChild(artLeftArrow);
@@ -930,13 +1023,16 @@
             const musicLeftArrow = document.createElement('div');
             musicLeftArrow.className = 'scroll-arrow scroll-arrow-left music-arrow-left';
             musicLeftArrow.addEventListener('click', () => {
-                spotifyGrid.scrollBy({ left: -300, behavior: 'smooth' });
+                const newScrollLeft = Math.max(0, spotifyGrid.scrollLeft - 300);
+                spotifyGrid.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
             });
             
             const musicRightArrow = document.createElement('div');
             musicRightArrow.className = 'scroll-arrow scroll-arrow-right music-arrow-right';
             musicRightArrow.addEventListener('click', () => {
-                spotifyGrid.scrollBy({ left: 300, behavior: 'smooth' });
+                const maxScroll = spotifyGrid.scrollWidth - spotifyGrid.clientWidth;
+                const newScrollLeft = Math.min(maxScroll, spotifyGrid.scrollLeft + 300);
+                spotifyGrid.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
             });
             
             musicContent.appendChild(musicLeftArrow);
