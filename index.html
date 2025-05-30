@@ -142,13 +142,29 @@
         /* Art Section */
         .art-content {
             text-align: center;
+            position: relative;
         }
 
         .art-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
             gap: 2rem;
             margin: 3rem 0;
+            padding: 0 2rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            justify-content: center; /* Center when no overflow */
+        }
+
+        .art-grid.has-overflow {
+            justify-content: flex-start; /* Left align when scrollable */
+        }
+
+        .art-grid::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
         }
 
         .art-item {
@@ -159,6 +175,69 @@
             cursor: pointer;
             overflow: hidden;
             position: relative;
+            flex: 0 0 250px; /* Fixed width, no shrinking */
+            height: 250px;
+        }
+
+        .art-item:hover {
+            transform: rotate(2deg) scale(1.05);
+            border-color: #ff69b4;
+        }
+
+        /* Scroll arrows - real elements for clickability */
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            cursor: pointer;
+            display: none; /* Hidden by default */
+        }
+
+        .scroll-arrow-left {
+            left: 20px;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-right: 20px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .scroll-arrow-right {
+            right: 20px;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            border-left: 20px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .scroll-arrow:hover {
+            opacity: 1 !important;
+        }
+
+        /* Show arrows when parent has overflow */
+        .art-content.has-overflow .scroll-arrow,
+        .music-content.has-overflow .scroll-arrow {
+            display: block;
+        }
+
+        .art-content.has-overflow:hover .scroll-arrow,
+        .music-content.has-overflow:hover .scroll-arrow {
+            opacity: 0.7;
+        }
+
+        .art-item {
+            aspect-ratio: 1;
+            background: #333;
+            border: 4px solid #fff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+            flex: 0 0 250px; /* Fixed width for auto-scroll */
+            height: 250px;
+            display: inline-block;
         }
 
         .art-item:hover {
@@ -176,7 +255,7 @@
             border: none !important;
             border-radius: 0 !important;
             position: absolute !important;
-            top: -17% !important; /* Move up to crop bottom and show more of the top */
+            top: -22% !important;
             left: 0 !important;
         }
 
@@ -186,9 +265,21 @@
             border: none !important;
             border-radius: 0 !important;
             position: absolute !important;
-            top: -10% !important; /* Move up to crop bottom */
+            top: -22% !important; /* Big screens - 17% */
             left: 0 !important;
         }
+
+        /* Medium screens - 20% crop */
+        @media (max-width: 1024px) {
+            .art-item .instagram-media {
+                top: -22% !important;
+            }
+            .art-item iframe {
+                top: -22% !important;
+            }
+        }
+
+        /* Remove unused animation styles */
 
         /* Instagram Button */
         .instagram-button {
@@ -217,17 +308,34 @@
         /* Music Section */
         .music-content {
             text-align: center;
+            position: relative;
         }
 
         .spotify-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
             gap: 2rem;
             margin: 3rem 0;
+            padding: 0 2rem;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            justify-content: center; /* Center when no overflow */
+        }
+
+        .spotify-grid.has-overflow {
+            justify-content: flex-start; /* Left align when scrollable */
+        }
+
+        .spotify-grid::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
         }
 
         .spotify-item {
             transition: transform 0.3s ease;
+            flex: 0 0 250px; /* Fixed width, no shrinking */
         }
 
         .spotify-item:hover {
@@ -235,10 +343,12 @@
         }
 
         .spotify-item iframe {
-            width: 100%;
+            width: 250px;
             height: 152px;
             border: none;
         }
+
+        /* Remove unused music content pseudo-element styles */
 
         /* Footer */
         #footer {
@@ -316,15 +426,7 @@
             animation: textReveal 4s ease-in-out forwards;
         }
 
-        /* Horizontal scrolling animations */
-        @keyframes scrollHorizontal {
-            0% {
-                transform: translateX(0);
-            }
-            100% {
-                transform: translateX(calc(-250px * var(--items) + 100vw - 2rem));
-            }
-        }
+        /* Remove unused horizontal scrolling keyframes */
 
         @media (max-width: 768px) {
             #header {
@@ -350,54 +452,33 @@
                 min-width: 80%;
             }
 
-            /* Mobile horizontal scrolling for art grid */
-            .art-grid {
-                display: flex;
-                overflow-x: auto;
-                overflow-y: hidden;
-                gap: 1rem;
-                margin: 3rem 0;
-                padding: 0 1rem;
-                scroll-behavior: smooth;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none; /* Firefox */
-                -ms-overflow-style: none; /* IE and Edge */
+            /* Small screens - 30% crop */
+            .art-item .instagram-media {
+                top: -26% !important;
+            }
+            .art-item iframe {
+                top: -26% !important;
             }
 
-            .art-grid::-webkit-scrollbar {
-                display: none; /* Chrome, Safari and Opera */
-            }
-
-            .art-grid .art-item {
-                flex: 0 0 200px; /* Fixed width, don't shrink */
+            /* Adjust sizing for mobile */
+            .art-item {
+                flex: 0 0 200px;
                 height: 200px;
             }
 
-            /* Mobile horizontal scrolling for spotify grid */
-            .spotify-grid {
-                display: flex;
-                overflow-x: auto;
-                overflow-y: hidden;
-                gap: 1rem;
-                margin: 3rem 0;
-                padding: 0 1rem;
-                scroll-behavior: smooth;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                -ms-overflow-style: none;
+            .spotify-item {
+                flex: 0 0 200px;
             }
 
-            .spotify-grid::-webkit-scrollbar {
-                display: none;
-            }
-
-            .spotify-grid .spotify-item {
-                flex: 0 0 250px; /* Fixed width, don't shrink */
-            }
-
-            .spotify-grid .spotify-item iframe {
-                width: 250px;
+            .spotify-item iframe {
+                width: 200px;
                 height: 152px;
+            }
+
+            /* Adjust grids for mobile */
+            .art-grid, .spotify-grid {
+                gap: 1rem;
+                padding: 0 1rem;
             }
         }
 
@@ -794,6 +875,81 @@
         window.addEventListener('scroll', checkFooterInView);
         window.addEventListener('load', checkFooterInView);
         setTimeout(checkFooterInView, 500);
+
+        // Check for overflow and show scroll indicators
+        function checkOverflow() {
+            const artGrid = document.querySelector('.art-grid');
+            const artContent = document.querySelector('.art-content');
+            const spotifyGrid = document.querySelector('.spotify-grid');
+            const musicContent = document.querySelector('.music-content');
+            
+            // Check art grid overflow
+            if (artGrid.scrollWidth > artGrid.clientWidth) {
+                artContent.classList.add('has-overflow');
+                artGrid.classList.add('has-overflow');
+            } else {
+                artContent.classList.remove('has-overflow');
+                artGrid.classList.remove('has-overflow');
+            }
+            
+            // Check spotify grid overflow
+            if (spotifyGrid.scrollWidth > spotifyGrid.clientWidth) {
+                musicContent.classList.add('has-overflow');
+                spotifyGrid.classList.add('has-overflow');
+            } else {
+                musicContent.classList.remove('has-overflow');
+                spotifyGrid.classList.remove('has-overflow');
+            }
+        }
+
+        // Create clickable arrow elements
+        function createScrollArrows() {
+            // Art section arrows
+            const artContent = document.querySelector('.art-content');
+            const artGrid = document.querySelector('.art-grid');
+            
+            const artLeftArrow = document.createElement('div');
+            artLeftArrow.className = 'scroll-arrow scroll-arrow-left art-arrow-left';
+            artLeftArrow.addEventListener('click', () => {
+                artGrid.scrollBy({ left: -300, behavior: 'smooth' });
+            });
+            
+            const artRightArrow = document.createElement('div');
+            artRightArrow.className = 'scroll-arrow scroll-arrow-right art-arrow-right';
+            artRightArrow.addEventListener('click', () => {
+                artGrid.scrollBy({ left: 300, behavior: 'smooth' });
+            });
+            
+            artContent.appendChild(artLeftArrow);
+            artContent.appendChild(artRightArrow);
+            
+            // Music section arrows
+            const musicContent = document.querySelector('.music-content');
+            const spotifyGrid = document.querySelector('.spotify-grid');
+            
+            const musicLeftArrow = document.createElement('div');
+            musicLeftArrow.className = 'scroll-arrow scroll-arrow-left music-arrow-left';
+            musicLeftArrow.addEventListener('click', () => {
+                spotifyGrid.scrollBy({ left: -300, behavior: 'smooth' });
+            });
+            
+            const musicRightArrow = document.createElement('div');
+            musicRightArrow.className = 'scroll-arrow scroll-arrow-right music-arrow-right';
+            musicRightArrow.addEventListener('click', () => {
+                spotifyGrid.scrollBy({ left: 300, behavior: 'smooth' });
+            });
+            
+            musicContent.appendChild(musicLeftArrow);
+            musicContent.appendChild(musicRightArrow);
+        }
+
+        // Check overflow on load and resize
+        window.addEventListener('load', () => {
+            createScrollArrows();
+            checkOverflow();
+        });
+        window.addEventListener('resize', checkOverflow);
+        checkOverflow();
     </script>
 </body>
 </html>
