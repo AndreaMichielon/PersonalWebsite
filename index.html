@@ -68,16 +68,12 @@
         }
 
         .section {
-            min-height: 60vh;
+            min-height: 60vh; /* Consistent height for all sections */
             padding: 4rem 5%;
             border-top: 4px solid #fff;
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-
-        .section:first-child {
-            min-height: 40vh;
         }
 
         .section h2 {
@@ -170,22 +166,28 @@
             border-color: #ff69b4;
         }
 
-        /* Instagram embeds - force square */
+        /* Instagram embeds - force square and crop from bottom */
         .art-item .instagram-media {
             width: 100% !important;
-            height: 100% !important;
+            height: 120% !important; /* Make it larger */
             min-width: 100% !important;
             max-width: 100% !important;
             margin: 0 !important;
             border: none !important;
             border-radius: 0 !important;
+            position: absolute !important;
+            top: -17% !important; /* Move up to crop bottom and show more of the top */
+            left: 0 !important;
         }
 
         .art-item iframe {
             width: 100% !important;
-            height: 100% !important;
+            height: 120% !important; /* Make it larger */
             border: none !important;
             border-radius: 0 !important;
+            position: absolute !important;
+            top: -10% !important; /* Move up to crop bottom */
+            left: 0 !important;
         }
 
         /* Instagram Button */
@@ -225,12 +227,11 @@
         }
 
         .spotify-item {
-            /* Remove all the background/border styling, keep just: */
             transition: transform 0.3s ease;
         }
 
         .spotify-item:hover {
-            transform: translateY(-5px); /* Just a subtle lift */
+            transform: translateY(-5px);
         }
 
         .spotify-item iframe {
@@ -257,7 +258,7 @@
             background: rgba(255, 255, 255, 0.9);
             display: inline-block;
             padding: 0.5rem 1rem;
-            opacity: 0; /* Start hidden */
+            opacity: 0;
             transform: translateX(-40px);
         }
 
@@ -282,11 +283,11 @@
                 transform: translateY(-50%) rotate(0deg);
             }
             70% {
-                left: calc(50% + 250px); /* Moved further right */
+                left: calc(50% + 250px);
                 transform: translateY(-50%) rotate(360deg);
             }
             100% {
-                left: calc(50% + 280px); /* Moved further right */
+                left: calc(50% + 280px);
                 transform: translateY(-50%) rotate(360deg);
             }
         }
@@ -296,7 +297,7 @@
                 opacity: 0;
                 transform: translateX(-20px);
             }
-            60% { /* Longer delay before text appears */
+            60% {
                 opacity: 0;
                 transform: translateX(-20px);
             }
@@ -313,6 +314,16 @@
 
         #footer.animate-footer #footer-text {
             animation: textReveal 4s ease-in-out forwards;
+        }
+
+        /* Horizontal scrolling animations */
+        @keyframes scrollHorizontal {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(calc(-250px * var(--items) + 100vw - 2rem));
+            }
         }
 
         @media (max-width: 768px) {
@@ -339,13 +350,54 @@
                 min-width: 80%;
             }
 
+            /* Mobile horizontal scrolling for art grid */
             .art-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                display: flex;
+                overflow-x: auto;
+                overflow-y: hidden;
                 gap: 1rem;
+                margin: 3rem 0;
+                padding: 0 1rem;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE and Edge */
             }
 
+            .art-grid::-webkit-scrollbar {
+                display: none; /* Chrome, Safari and Opera */
+            }
+
+            .art-grid .art-item {
+                flex: 0 0 200px; /* Fixed width, don't shrink */
+                height: 200px;
+            }
+
+            /* Mobile horizontal scrolling for spotify grid */
             .spotify-grid {
-                grid-template-columns: 1fr;
+                display: flex;
+                overflow-x: auto;
+                overflow-y: hidden;
+                gap: 1rem;
+                margin: 3rem 0;
+                padding: 0 1rem;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+            }
+
+            .spotify-grid::-webkit-scrollbar {
+                display: none;
+            }
+
+            .spotify-grid .spotify-item {
+                flex: 0 0 250px; /* Fixed width, don't shrink */
+            }
+
+            .spotify-grid .spotify-item iframe {
+                width: 250px;
+                height: 152px;
             }
         }
 
@@ -480,8 +532,10 @@
         var camera, scene, renderer;
         var model;
         var isRotating = false;
-        var targetRotation = { x: 0, y: 0 };
-        var currentRotation = { x: 0, y: 0 };
+        var targetRotation = { x: -0.45, y: 0.32 }; // Set default position
+        var currentRotation = { x: -0.45, y: 0.32 };
+        var mouseInfluence = { x: 0, y: 0 };
+        var lastTouchTime = 0;
 
         init();
         animate();
@@ -522,25 +576,23 @@
             renderer.setClearColor(0x000000);
             container.appendChild(renderer.domElement);
 
-            // Mouse movement listener
-            window.addEventListener('mousemove', onDocumentMouseMove, false);
+            // Simplified mouse movement listener - only for desktop
+            if (!('ontouchstart' in window)) {
+                window.addEventListener('mousemove', onDocumentMouseMove, false);
+            }
             
             // Click listener for 360 rotation
-            container.addEventListener('click', function() {
+            container.addEventListener('click', function(e) {
                 if (model && !isRotating) {
+                    e.preventDefault();
                     do360Rotation();
                 }
             }, false);
 
-            window.addEventListener('touchstart', onDocumentTouchStart, { passive: true });
-            window.addEventListener('touchmove', onDocumentTouchMove, { passive: false });
-            window.addEventListener('touchend', onDocumentTouchEnd, { passive: true });
-
-            // Scroll listener for mobile rotation
-            window.addEventListener('scroll', onDocumentScroll, { passive: true });
-
-            // Tap listener for 360 rotation on mobile
-            container.addEventListener('touchstart', onDocumentTap, { passive: true });
+            // Simplified touch handlers
+            container.addEventListener('touchstart', onTouchStart, { passive: false });
+            container.addEventListener('touchmove', onTouchMove, { passive: false });
+            container.addEventListener('touchend', onTouchEnd, { passive: false });
 
             window.addEventListener('resize', onWindowResize, false);
             
@@ -597,94 +649,72 @@
 
         function onDocumentMouseMove(event) {
             if (!isRotating && model) {
-                // Get the model container's position and dimensions
                 var containerRect = container.getBoundingClientRect();
                 var containerCenterX = containerRect.left + containerRect.width / 2;
                 var containerCenterY = containerRect.top + containerRect.height / 2;
                 
-                // Calculate mouse position relative to container center
-                // Normalize to -1 to 1 range based on container size
                 var mouseX = (event.clientX - containerCenterX) / (containerRect.width / 2);
                 var mouseY = (event.clientY - containerCenterY) / (containerRect.height / 2);
                 
-                // Apply rotation with your desired offset and sensitivity
-                targetRotation.x = mouseY * 0.2 - 0.45; // Look slightly down + mouse influence
-                targetRotation.y = mouseX * 0.15 + 0.32; // Look slightly left + mouse influence
+                mouseInfluence.x = mouseY * 0.2;
+                mouseInfluence.y = mouseX * 0.15;
+                
+                updateTargetRotation();
             }
         }
 
-        // Mobile touch support
-        var lastTouchX = 0;
-        var lastTouchY = 0;
-        var scrollInfluence = { x: 0, y: 0 };
-
-        // Touch event handlers for mobile
-        function onDocumentTouchStart(event) {
+        // Simplified touch handlers
+        function onTouchStart(event) {
             if (event.touches.length === 1) {
-                lastTouchX = event.touches[0].clientX;
-                lastTouchY = event.touches[0].clientY;
+                lastTouchTime = Date.now();
+                event.preventDefault(); // Prevent scrolling when touching the model
             }
         }
 
-        function onDocumentTouchMove(event) {
+        function onTouchMove(event) {
             if (!isRotating && model && event.touches.length === 1) {
                 var touch = event.touches[0];
-                
-                // Get the model container's position and dimensions
                 var containerRect = container.getBoundingClientRect();
-                var containerCenterX = containerRect.left + containerRect.width / 2;
-                var containerCenterY = containerRect.top + containerRect.height / 2;
                 
-                // Calculate touch position relative to container center
-                var touchX = (touch.clientX - containerCenterX) / (containerRect.width / 2);
-                var touchY = (touch.clientY - containerCenterY) / (containerRect.height / 2);
-                
-                // Apply rotation similar to mouse movement
-                targetRotation.x = touchY * 0.2 - 0.45;
-                targetRotation.y = touchX * 0.15 + 0.32;
-            }
-        }
-
-        function onDocumentTouchEnd(event) {
-            // Smooth return to base position when touch ends
-            setTimeout(() => {
-                if (!isRotating) {
-                    targetRotation.x = -0.45; // Base X position
-                    targetRotation.y = 0.32;  // Base Y position
-                }
-            }, 500);
-        }
-
-        // Improved scroll-based rotation for mobile
-        function onDocumentScroll() {
-            if (!isRotating && model) {
-                var currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
-                var scrollDelta = (currentScrollY % 1000) / 1000; // Normalize scroll position
-                
-                // Create subtle oscillation based on scroll position
-                scrollInfluence.x = Math.sin(scrollDelta * Math.PI * 2) * 0.1;
-                scrollInfluence.y = Math.cos(scrollDelta * Math.PI * 2) * 0.1;
-                
-                // Add scroll influence to base rotation (don't override)
-                targetRotation.x = -0.45 + scrollInfluence.x;
-                targetRotation.y = 0.32 + scrollInfluence.y;
-            }
-        }
-
-        // Tap gesture for 360 rotation (mobile)
-        function onDocumentTap(event) {
-            if (model && !isRotating && event.touches.length === 1) {
-                var containerRect = container.getBoundingClientRect();
-                var touch = event.touches[0];
-                
-                // Check if tap is within the model container
+                // Check if touch is within container
                 if (touch.clientX >= containerRect.left && 
                     touch.clientX <= containerRect.right &&
                     touch.clientY >= containerRect.top && 
                     touch.clientY <= containerRect.bottom) {
-                    do360Rotation();
+                    
+                    event.preventDefault(); // Prevent page scrolling
+                    
+                    var containerCenterX = containerRect.left + containerRect.width / 2;
+                    var containerCenterY = containerRect.top + containerRect.height / 2;
+                    
+                    var touchX = (touch.clientX - containerCenterX) / (containerRect.width / 2);
+                    var touchY = (touch.clientY - containerCenterY) / (containerRect.height / 2);
+                    
+                    mouseInfluence.x = touchY * 0.2;
+                    mouseInfluence.y = touchX * 0.15;
+                    
+                    updateTargetRotation();
                 }
             }
+        }
+
+        function onTouchEnd(event) {
+            var touchDuration = Date.now() - lastTouchTime;
+            
+            // If it was a quick tap (less than 200ms), trigger rotation
+            if (touchDuration < 200 && !isRotating && model) {
+                do360Rotation();
+            }
+            
+            // Reset mouse influence
+            mouseInfluence.x = 0;
+            mouseInfluence.y = 0;
+            updateTargetRotation();
+        }
+
+        function updateTargetRotation() {
+            targetRotation.x = -0.45 + mouseInfluence.x;
+            targetRotation.y = 0.32 + mouseInfluence.y;
         }
 
         function do360Rotation() {
@@ -692,13 +722,12 @@
             var startTime = Date.now();
             var duration = Math.floor(Math.random() * (2000 - 100 + 1)) + 100;
             var startRotationY = model.rotation.y;
-            var targetRotationY = startRotationY + Math.PI * 2; // 360 degrees
+            var targetRotationY = startRotationY + Math.PI * 2;
 
             function rotateStep() {
                 var elapsed = Date.now() - startTime;
                 var progress = Math.min(elapsed / duration, 1);
                 
-                // Easing function
                 var easeProgress = 1 - Math.pow(1 - progress, 3);
                 
                 model.rotation.y = startRotationY + (targetRotationY - startRotationY) * easeProgress;
@@ -723,7 +752,6 @@
             requestAnimationFrame(animate);
             
             if (model && !isRotating) {
-                // Smooth interpolation to target rotation
                 currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
                 currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
                 
@@ -740,26 +768,20 @@
             const rect = footer.getBoundingClientRect();
             const windowHeight = window.innerHeight;
             
-            // Check if footer is visible (top of footer is within viewport)
             const isVisible = rect.top <= windowHeight && rect.bottom >= 0;
             
             if (isVisible && !footer.classList.contains('animate-footer')) {
-                // Footer came into view - start animation
                 footer.classList.add('animate-footer');
                 console.log('Footer animation triggered!');
             } else if (!isVisible && footer.classList.contains('animate-footer')) {
-                // Footer went out of view - reset for next time
                 footer.classList.remove('animate-footer');
                 
-                // Reset the icon and text to initial state
                 const footerIcon = document.getElementById('footer-icon');
                 const footerText = document.getElementById('footer-text');
                 
-                // Force reset by removing and re-adding the elements
                 footerIcon.style.animation = 'none';
                 footerText.style.animation = 'none';
                 
-                // Use setTimeout to ensure the reset takes effect
                 setTimeout(() => {
                     footerIcon.style.animation = '';
                     footerText.style.animation = '';
@@ -769,11 +791,8 @@
             }
         }
 
-        // Add event listeners
         window.addEventListener('scroll', checkFooterInView);
         window.addEventListener('load', checkFooterInView);
-
-        // Also try triggering after a small delay on load
         setTimeout(checkFooterInView, 500);
     </script>
 </body>
