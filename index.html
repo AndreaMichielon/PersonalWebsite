@@ -253,17 +253,7 @@
             transition: all 0.3s ease;
             overflow: hidden;
             position: relative;
-        }
-
-        .spotify-click-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10;
             cursor: pointer;
-            background: transparent;
         }
 
         .spotify-item:hover {
@@ -474,7 +464,7 @@
             <h2>Visuals</h2>
             <div class="art-content">
                 <a href="https://www.instagram.com/spineless_inc/" class="video-instagram-button" target="_blank">
-                    <video autoplay muted loop playsinline>
+                    <video autoplay muted loop playsinline preload="auto" webkit-playsinline="true">
                         <source src="static/mp4/loop.mp4" type="video/mp4">
                     </video>
                     <span class="button-text">@spineless_inc</span>
@@ -488,35 +478,30 @@
             <div class="music-content">
                 <div class="spotify-grid">
                     <div class="spotify-item">
-                        <div class="spotify-click-overlay"></div>
                         <iframe src="https://open.spotify.com/embed/track/3f27mtLKBWGcGC5VXbMNji" 
                                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                                 loading="lazy"></iframe>
                     </div>
 
                     <div class="spotify-item">
-                        <div class="spotify-click-overlay"></div>
                         <iframe src="https://open.spotify.com/embed/track/0yYFkxXwuGOggxrIs9cy8l" 
                                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                                 loading="lazy"></iframe>
                     </div>
 
                     <div class="spotify-item">
-                        <div class="spotify-click-overlay"></div>
                         <iframe src="https://open.spotify.com/embed/track/0Gf4mnNJzkTj0ZT6piQY9R" 
                                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                                 loading="lazy"></iframe>
                     </div>
 
                     <div class="spotify-item">
-                        <div class="spotify-click-overlay"></div>
                         <iframe src="https://open.spotify.com/embed/track/3zSBsvj6MWavRKfPE51395" 
                                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                                 loading="lazy"></iframe>
                     </div>
 
                     <div class="spotify-item">
-                        <div class="spotify-click-overlay"></div>
                         <iframe src="https://open.spotify.com/embed/track/6bGDr2wSAAuVvVWhMzax7w" 
                                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
                                 loading="lazy"></iframe>
@@ -640,8 +625,8 @@
             });
 
             // Spotify items
-            document.querySelectorAll('.spotify-click-overlay').forEach(function(overlay) {
-                overlay.addEventListener('mouseenter', function() {
+            document.querySelectorAll('.spotify-item').forEach(function(item) {
+                item.addEventListener('mouseenter', function() {
                     if (model && !isRotating) {
                         do360Rotation();
                     }
