@@ -574,6 +574,13 @@
             window.addEventListener('mousemove', onDocumentMouseMove, false);
             
             // Click listener for 360 rotation
+            container.addEventListener('mouseenter', function() {
+                if (model && !isRotating) {
+                    do360Rotation();
+                }
+            }, false);
+
+            // Click listener for 360 rotation on model container  
             container.addEventListener('click', function() {
                 if (model && !isRotating) {
                     do360Rotation();
@@ -599,7 +606,7 @@
         function addSpinListeners() {
             // CV buttons
             document.querySelectorAll('.cv-button').forEach(function(button) {
-                button.addEventListener('click', function() {
+                button.addEventListener('mouseenter', function() {
                     if (model && !isRotating) {
                         do360Rotation();
                     }
@@ -608,7 +615,7 @@
             
             // Research link
             document.querySelectorAll('.research-link').forEach(function(link) {
-                link.addEventListener('click', function() {
+                link.addEventListener('mouseenter', function() {
                     if (model && !isRotating) {
                         do360Rotation();
                     }
@@ -617,7 +624,7 @@
             
             // Video Instagram button
             document.querySelectorAll('.video-instagram-button').forEach(function(button) {
-                button.addEventListener('click', function() {
+                button.addEventListener('mouseenter', function() {
                     if (model && !isRotating) {
                         do360Rotation();
                     }
