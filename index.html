@@ -531,6 +531,17 @@
         var targetRotation = { x: 0, y: 0 };
         var currentRotation = { x: 0, y: 0 };
 
+        var modelSequence = [0, 1, 0, 2]; // HEAD > ai_head > HEAD > head_25x29x29
+        var currentSequenceIndex = 0;
+        var models = [
+            { obj: 'HEAD.obj', mtl: 'HEAD.mtl', texture: 'texture_1001.png' },
+            { obj: 'ai_head_render.obj', mtl: 'ai_head_render.obj.mtl', texture: 'material7.png' },
+            { obj: 'head_25x29x29.obj', mtl: 'head_25x29x29.obj.mtl', texture: 'texture_1001.png' }
+        ];
+        var loadedModels = {};
+        var isLoadingModels = false;
+        var activeModel = null;
+
         init();
         animate();
 
@@ -546,25 +557,6 @@
             camera.add(light);
             scene.add(camera);
 
-            var manager = new THREE.LoadingManager();
-            manager.onProgress = function (item, loaded, total) {
-                console.log(item, loaded, total);
-            };
-
-            var mtlLoader = new THREE.MTLLoader(manager);
-            mtlLoader.setPath('static/models/');
-            mtlLoader.load('HEAD.mtl', function (materials) {
-                materials.preload();
-                var objLoader = new THREE.OBJLoader(manager);
-                objLoader.setMaterials(materials);
-                objLoader.setPath('static/models/');
-                objLoader.load('HEAD.obj', function (object) {
-                    model = object;
-                    model.position.set(0, 0, 0);
-                    scene.add(model);
-                });
-            });
-
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(container.offsetWidth, container.offsetHeight);
             renderer.setClearColor(0x000000);
@@ -572,35 +564,165 @@
 
             // Mouse movement listener
             window.addEventListener('mousemove', onDocumentMouseMove, false);
-            
-            // Click listener for 360 rotation
-            container.addEventListener('mouseenter', function() {
-                if (model && !isRotating) {
-                    do360Rotation();
-                }
-            }, false);
-
-            // Click listener for 360 rotation on model container  
             container.addEventListener('click', function() {
-                if (model && !isRotating) {
+                if (activeModel && !isRotating) {
                     do360Rotation();
                 }
             }, false);
-
             window.addEventListener('touchstart', onDocumentTouchStart, { passive: true });
             window.addEventListener('touchmove', onDocumentTouchMove, { passive: false });
             window.addEventListener('touchend', onDocumentTouchEnd, { passive: true });
-
-            // Scroll listener for mobile rotation
             window.addEventListener('scroll', onDocumentScroll, { passive: true });
-
-            // Tap listener for 360 rotation on mobile
             container.addEventListener('touchstart', onDocumentTap, { passive: true });
-
             window.addEventListener('resize', onWindowResize, false);
             
-            // Add spin listeners for all interactive elements
+            // Preload all models
+            preloadAllModels();
             addSpinListeners();
+        }
+
+        function preloadAllModels() {
+            isLoadingModels = true;
+            var loadCount = 0;
+            var totalModels = models.length;
+            var uniqueModels = {};
+            
+            // Get unique models to avoid loading HEAD twice
+            models.forEach(function(modelInfo, index) {
+                var key = modelInfo.obj + '|' + modelInfo.mtl;
+                if (!uniqueModels[key]) {
+                    uniqueModels[key] = { ...modelInfo, originalIndex: index };
+                }
+            });
+            
+            var uniqueModelArray = Object.values(uniqueModels);
+            var totalUnique = uniqueModelArray.length;
+            
+            uniqueModelArray.forEach(function(modelInfo, index) {
+                var manager = new THREE.LoadingManager();
+                manager.onLoad = function() {
+                    loadCount++;
+                    if (loadCount === totalUnique) {
+                        isLoadingModels = false;
+                        // Show first model
+                        showModel(0);
+                    }
+                };
+                
+                var mtlLoader = new THREE.MTLLoader(manager);
+                mtlLoader.setPath('static/models/');
+                mtlLoader.load(modelInfo.mtl, function (materials) {
+                    materials.preload();
+                    var objLoader = new THREE.OBJLoader(manager);
+                    objLoader.setMaterials(materials);
+                    objLoader.setPath('static/models/');
+                    objLoader.load(modelInfo.obj, function (object) {
+                        // Normalize scale to match HEAD model
+                        if (index > 0) {
+                            var box = new THREE.Box3().setFromObject(object);
+                            var size = box.getSize(new THREE.Vector3());
+                            var maxDimension = Math.max(size.x, size.y, size.z);
+                            var targetScale = 1.0; // Adjust this if needed
+                            var scale = targetScale / maxDimension;
+                            object.scale.setScalar(scale);
+                        }
+                        object.position.set(0, 0, 0);
+                        object.visible = false;
+                        scene.add(object);
+                        loadedModels[modelInfo.obj] = object;
+                    });
+                });
+            });
+        }
+
+        function showModel(modelIndex) {
+            var modelInfo = models[modelIndex];
+            var newModel = loadedModels[modelInfo.obj];
+            
+            if (newModel && newModel !== activeModel) {
+                // Fade out current model
+                if (activeModel) {
+                    fadeOutModel(activeModel);
+                }
+                
+                // Fade in new model
+                fadeInModel(newModel);
+                activeModel = newModel;
+                model = activeModel;
+            }
+        }
+
+        function fadeOutModel(modelToFade) {
+            var startTime = Date.now();
+            var duration = 300;
+            
+            function fadeStep() {
+                var elapsed = Date.now() - startTime;
+                var progress = Math.min(elapsed / duration, 1);
+                var opacity = 1 - progress;
+                
+                modelToFade.traverse(function(child) {
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(function(mat) {
+                                mat.transparent = true;
+                                mat.opacity = opacity;
+                            });
+                        } else {
+                            child.material.transparent = true;
+                            child.material.opacity = opacity;
+                        }
+                    }
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(fadeStep);
+                } else {
+                    modelToFade.visible = false;
+                }
+            }
+            
+            fadeStep();
+        }
+
+        function fadeInModel(modelToFade) {
+            modelToFade.visible = true;
+            var startTime = Date.now();
+            var duration = 300;
+            
+            function fadeStep() {
+                var elapsed = Date.now() - startTime;
+                var progress = Math.min(elapsed / duration, 1);
+                var opacity = progress;
+                
+                modelToFade.traverse(function(child) {
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(function(mat) {
+                                mat.transparent = true;
+                                mat.opacity = opacity;
+                            });
+                        } else {
+                            child.material.transparent = true;
+                            child.material.opacity = opacity;
+                        }
+                    }
+                });
+                
+                if (progress < 1) {
+                    requestAnimationFrame(fadeStep);
+                }
+            }
+            
+            fadeStep();
+        }
+
+        function loadNextModel() {
+            if (isLoadingModels) return;
+            
+            currentSequenceIndex = (currentSequenceIndex + 1) % modelSequence.length;
+            var modelIndex = modelSequence[currentSequenceIndex];
+            showModel(modelIndex);
         }
 
         function addSpinListeners() {
@@ -734,6 +856,7 @@
         }
 
         function do360Rotation() {
+            if (isLoadingModels) return;
             isRotating = true;
             var startTime = Date.now();
 
@@ -747,10 +870,18 @@
             var startRotationY = model.rotation.y;
             var targetRotationY = startRotationY + Math.PI * 4; // 720 degrees instead of 360
             
+            var modelSwitched = false;
+
             // Add a bounce effect
             function rotateStep() {
                 var elapsed = Date.now() - startTime;
                 var progress = Math.min(elapsed / duration, 1);
+                
+                // Switch model at 50% progress
+                if (progress >= 0.66 && !modelSwitched) {
+                    modelSwitched = true;
+                    loadNextModel();
+                }
                 
                 // Bounce easing function
                 var easeProgress = progress < 0.5 
