@@ -106,6 +106,10 @@
             background: #000;
         }
 
+        .row {
+            display: block;
+        }
+
         .section {
             min-height: 60vh;
             padding: 4rem 5%;
@@ -129,25 +133,27 @@
 
         /* Unified Button Styles */
         .cv-button,
-        .research-link{
+        .research-link,
+        .social-button {
             display: inline-block;
             background: #000;
             color: #fff;
-            padding: 2rem 3rem;
+            padding: 1.2rem 2rem;
             text-decoration: none;
             font-weight: 900;
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
             border: 4px solid #fff;
             text-align: center;
-            min-width: 200px;
-            margin: 1rem;
+            min-width: 180px;
+            margin: 0.5rem;
         }
 
         .cv-button:hover,
         .research-link:hover,
+        .social-button:hover,
         .instagram-button:hover {
             background: #fff;
             color: #000;
@@ -156,14 +162,14 @@
         }
 
         .research-link {
-            font-size: 1.5rem;
-            padding: 2rem 4rem;
+            font-size: 1rem;
+            padding: 1.2rem 2rem;
         }
 
         /* CV Section */
         .cv-buttons {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -348,6 +354,249 @@
             animation: textReveal 4s ease-in-out forwards;
         }
 
+        /* Wide Screen Layout - Asymmetric Grid */
+        @media (min-width: 1750px) {
+            body {
+                overflow: hidden;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #main-content {
+                display: grid;
+                grid-template-rows: auto auto;
+                gap: 0;
+                flex: 1;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .row {
+                display: grid;
+                grid-template-columns: auto auto;
+                align-items: stretch;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .row:first-child {
+                grid-template-columns: 2fr 1fr;
+                border-top: 4px solid #fff;
+                border-bottom: 4px solid #fff;
+            }
+
+            .row:last-child {
+                grid-template-columns: 1fr max-content;
+                max-height: fit-content;
+            }
+
+            .section {
+                padding: 2.5rem 4%;
+                border: 4px solid #fff;
+                border-top: none;
+                border-bottom: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: stretch;
+                overflow: hidden;
+                min-height: 0;
+                height: auto;
+            }
+
+            .row:first-child .section {
+                width: 100%;
+                padding-top: 2rem;
+                padding-bottom: 3.5rem;
+                min-height: fit-content;
+            }
+
+            .row:first-child .section h2 {
+                margin-bottom: 1.5rem;
+            }
+
+            .row:first-child .section:last-child {
+                padding-top: 2rem;
+                padding-bottom: 3.5rem;
+                padding-left: 3rem;
+                padding-right: 3rem;
+                min-height: fit-content;
+            }
+
+            .row:first-child .section:last-child h2 {
+                margin-bottom: 1.5rem;
+            }
+
+            .row:first-child .cv-buttons {
+                gap: 0.75rem;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .row:first-child .social-button,
+            .row:first-child .cv-button {
+                margin: 0.25rem;
+                flex: 1 1 0;
+                max-width: 100%;
+            }
+
+            .row:first-child .publications-content {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+
+            .row:first-child .research-link {
+                width: 100%;
+                max-width: 100%;
+                margin: 0.25rem;
+            }
+
+            .row .section:first-child {
+                border-left: 4px solid #fff;
+                border-right: 2px solid #fff;
+            }
+
+            .row .section:last-child {
+                border-right: 4px solid #fff;
+                border-left: 2px solid #fff;
+            }
+
+            .row:last-child .section {
+                border-bottom: 4px solid #fff;
+                padding-top: 1.5rem;
+                padding-bottom: 1rem;
+            }
+
+            .row:last-child .section h2 {
+                margin-bottom: 1rem;
+            }
+
+            .row:last-child .section:first-child {
+                width: 100%;
+                flex: 1;
+            }
+
+            .row:last-child .section:last-child {
+                width: fit-content;
+                min-width: fit-content;
+                max-width: fit-content;
+                flex: 0 0 auto;
+            }
+
+            .section:has(.spotify-grid) {
+                padding-left: 2rem;
+                padding-right: 2rem;
+                width: fit-content;
+                min-width: fit-content;
+                max-width: fit-content;
+                align-items: flex-start;
+            }
+
+            .section:has(.cv-buttons) {
+                align-items: stretch;
+            }
+
+            .section:has(.art-content) {
+                width: 100%;
+                min-width: 0;
+                padding-left: 2.5rem;
+                padding-right: 2.5rem;
+                flex: 1;
+            }
+
+            .section h2 {
+                font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+                font-weight: 900;
+                text-transform: uppercase;
+                margin-bottom: 2rem;
+                letter-spacing: -1px;
+                text-align: left;
+                width: 100%;
+            }
+
+            .art-content {
+                display: flex;
+                align-items: flex-start;
+                justify-content: flex-start;
+                width: 100%;
+                height: auto;
+                flex: 0 0 auto;
+            }
+
+            .video-instagram-button {
+                width: 100%;
+                height: 152px;
+                max-width: 100%;
+                aspect-ratio: auto;
+                flex-shrink: 0;
+            }
+
+            .music-content {
+                display: flex;
+                flex-direction: column;
+                flex: 0 0 auto;
+                justify-content: flex-start;
+                align-items: flex-start;
+                height: auto;
+                width: 100%;
+            }
+
+            .spotify-grid {
+                grid-template-columns: repeat(4, auto);
+                gap: 0.5rem;
+                margin: 0;
+                width: fit-content;
+                justify-items: center;
+                overflow: visible;
+            }
+
+            .spotify-item {
+                background: #fff;
+                border: 4px solid #fff;
+                width: 100%;
+                max-width: 280px;
+                box-sizing: content-box;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .spotify-item::after {
+                content: '';
+                display: block;
+                height: 0;
+                overflow: hidden;
+            }
+
+            .spotify-item iframe {
+                width: 100%;
+                height: 152px;
+                border: none;
+                display: block;
+            }
+
+            #footer {
+                margin-top: 0;
+                flex-shrink: 0;
+            }
+        }
+
+        /* Medium Screen Layout - Better button wrapping */
+        @media (min-width: 769px) and (max-width: 1749px) {
+            .cv-buttons {
+                gap: 1rem;
+                justify-content: center;
+            }
+            
+            .cv-button,
+            .social-button {
+                min-width: 150px;
+                padding: 1rem 1.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             #header {
@@ -374,6 +623,7 @@
             }
             
             .cv-button,
+            .social-button,
             .research-link,
             .instagram-button {
                 min-width: 80%;
@@ -435,80 +685,86 @@
 
     <!-- Main Content -->
     <div id="main-content">
-        <!-- CV Section -->
-        <section class="section">
-            <h2>About Me</h2>
-            <div class="cv-buttons">
-                <a href="static/pdf/CV_Andrea_Michielon_ENG.pdf" download class="cv-button">
-                    CV [eng]
-                </a>
-                <a href="static/pdf/CV_Andrea_Michielon_ITA.pdf" download class="cv-button">
-                    CV [ita]
-                </a>
-                <a href="mailto:andrea.michielon97@gmail.com" class="cv-button">
-                    MAIL
-                </a>
-            </div>
-        </section>
+        <!-- Row 1 -->
+        <div class="row">
+            <!-- CV Section -->
+            <section class="section">
+                <h2>About Me</h2>
+                <div class="cv-buttons">
+                    <a href="https://www.linkedin.com/in/andrea-michielon-73222b214/" class="social-button" target="_blank">
+                        LINKEDIN
+                    </a>
+                    <a href="https://github.com/AndreaMichielon" class="social-button" target="_blank">
+                        GITHUB
+                    </a>
+                    <a href="static/pdf/CV_Andrea_Michielon_ENG.pdf" download class="cv-button">
+                        CV [eng]
+                    </a>
+                    <a href="static/pdf/CV_Andrea_Michielon_ITA.pdf" download class="cv-button">
+                        CV [ita]
+                    </a>
+                    <a href="mailto:andrea.michielon97@gmail.com" class="cv-button">
+                        MAIL
+                    </a>
+                </div>
+            </section>
 
-        <!-- Publications Section -->
-        <section class="section">
-            <h2>Publications</h2>
-            <div class="publications-content">
-                <a href="https://orcid.org/0009-0008-2502-9818" class="research-link" target="_blank">View Research Papers</a>
-            </div>
-        </section>
+            <!-- Publications Section -->
+            <section class="section">
+                <h2>Publications</h2>
+                <div class="publications-content">
+                    <a href="https://orcid.org/0009-0008-2502-9818" class="research-link" target="_blank">View Research Papers</a>
+                </div>
+            </section>
+        </div>
 
-        <!-- Art Section -->
-        <section class="section">
-            <h2>Visuals</h2>
-            <div class="art-content">
-                <a href="https://www.instagram.com/spineless_inc/" class="video-instagram-button" target="_blank">
-                    <video autoplay muted loop playsinline preload="auto" webkit-playsinline="true">
-                        <source src="static/mp4/loop.mp4" type="video/mp4">
-                    </video>
-                    <span class="button-text">@spineless_inc</span>
-                </a>
-            </div>
-        </section>
+        <!-- Row 2 -->
+        <div class="row">
+            <!-- Art Section -->
+            <section class="section">
+                <h2>Visuals</h2>
+                <div class="art-content">
+                    <a href="https://www.instagram.com/spineless_inc/" class="video-instagram-button" target="_blank">
+                        <video autoplay muted loop playsinline preload="auto" webkit-playsinline="true">
+                            <source src="static/mp4/loop.mp4" type="video/mp4">
+                        </video>
+                        <span class="button-text">@spineless_inc</span>
+                    </a>
+                </div>
+            </section>
 
-        <!-- Music Section -->
-        <section class="section">
-            <h2>Now playing</h2>
-            <div class="music-content">
-                <div class="spotify-grid">
-                    <div class="spotify-item">
-                        <iframe src="https://open.spotify.com/embed/track/3f27mtLKBWGcGC5VXbMNji" 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy"></iframe>
-                    </div>
+            <!-- Music Section -->
+            <section class="section">
+                <h2>Now playing</h2>
+                <div class="music-content">
+                    <div class="spotify-grid">
+                        <div class="spotify-item">
+                            <iframe src="https://open.spotify.com/embed/track/3f27mtLKBWGcGC5VXbMNji" 
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                    loading="lazy"></iframe>
+                        </div>
 
-                    <div class="spotify-item">
-                        <iframe src="https://open.spotify.com/embed/track/0yYFkxXwuGOggxrIs9cy8l" 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy"></iframe>
-                    </div>
+                        <div class="spotify-item">
+                            <iframe src="https://open.spotify.com/embed/track/0Gf4mnNJzkTj0ZT6piQY9R" 
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                    loading="lazy"></iframe>
+                        </div>
 
-                    <div class="spotify-item">
-                        <iframe src="https://open.spotify.com/embed/track/0Gf4mnNJzkTj0ZT6piQY9R" 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy"></iframe>
-                    </div>
+                        <div class="spotify-item">
+                            <iframe src="https://open.spotify.com/embed/track/3zSBsvj6MWavRKfPE51395" 
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                    loading="lazy"></iframe>
+                        </div>
 
-                    <div class="spotify-item">
-                        <iframe src="https://open.spotify.com/embed/track/3zSBsvj6MWavRKfPE51395" 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy"></iframe>
-                    </div>
-
-                    <div class="spotify-item">
-                        <iframe src="https://open.spotify.com/embed/track/6bGDr2wSAAuVvVWhMzax7w" 
-                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
-                                loading="lazy"></iframe>
+                        <div class="spotify-item">
+                            <iframe src="https://open.spotify.com/embed/track/6bGDr2wSAAuVvVWhMzax7w" 
+                                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                    loading="lazy"></iframe>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
 
     <!-- Footer -->
@@ -526,21 +782,20 @@
     <script>
         var container = document.getElementById('model-container');
         var camera, scene, renderer;
-        var model;
-        var isRotating = false;
-        var targetRotation = { x: 0, y: 0 };
-        var currentRotation = { x: 0, y: 0 };
-
-        var modelSequence = [0, 1, 0, 2]; // HEAD > ai_head > HEAD > head_25x29x29
-        var currentSequenceIndex = 0;
         var models = [
             { obj: 'HEAD.obj', mtl: 'HEAD.mtl', texture: 'texture_1001.png' },
             { obj: 'ai_head_render.obj', mtl: 'ai_head_render.obj.mtl', texture: 'material7.png' },
             { obj: 'head_25x29x29.obj', mtl: 'head_25x29x29.obj.mtl', texture: 'texture_1001.png' }
         ];
+        var modelSequence = [0, 1, 0, 2]; // HEAD > ai_head > HEAD > head_25x29x29
+        var currentSequenceIndex = 0;
         var loadedModels = {};
         var isLoadingModels = false;
         var activeModel = null;
+        var model;
+        var isRotating = false;
+        var targetRotation = { x: 0, y: 0 };
+        var currentRotation = { x: 0, y: 0 };
 
         init();
         animate();
@@ -562,22 +817,32 @@
             renderer.setClearColor(0x000000);
             container.appendChild(renderer.domElement);
 
+            // Preload all models
+            preloadAllModels();
+
             // Mouse movement listener
             window.addEventListener('mousemove', onDocumentMouseMove, false);
+            
+            // Click listener for 360 rotation
             container.addEventListener('click', function() {
                 if (activeModel && !isRotating) {
                     do360Rotation();
                 }
             }, false);
+
             window.addEventListener('touchstart', onDocumentTouchStart, { passive: true });
             window.addEventListener('touchmove', onDocumentTouchMove, { passive: false });
             window.addEventListener('touchend', onDocumentTouchEnd, { passive: true });
+
+            // Scroll listener for mobile rotation
             window.addEventListener('scroll', onDocumentScroll, { passive: true });
+
+            // Tap listener for 360 rotation on mobile
             container.addEventListener('touchstart', onDocumentTap, { passive: true });
+
             window.addEventListener('resize', onWindowResize, false);
             
-            // Preload all models
-            preloadAllModels();
+            // Add spin listeners for all interactive elements
             addSpinListeners();
         }
 
@@ -640,13 +905,24 @@
             var newModel = loadedModels[modelInfo.obj];
             
             if (newModel && newModel !== activeModel) {
-                // Fade out current model
+                // Preserve rotation from previous model
+                var previousRotation = activeModel ? {
+                    x: activeModel.rotation.x,
+                    y: activeModel.rotation.y,
+                    z: activeModel.rotation.z
+                } : { x: 0, y: 0, z: 0 };
+                
+                // Set new model rotation to match previous model
+                newModel.rotation.x = previousRotation.x;
+                newModel.rotation.y = previousRotation.y;
+                newModel.rotation.z = previousRotation.z;
+                
+                // Cross-fade: Start fading in new model immediately while fading out old one
                 if (activeModel) {
                     fadeOutModel(activeModel);
                 }
-                
-                // Fade in new model
                 fadeInModel(newModel);
+                
                 activeModel = newModel;
                 model = activeModel;
             }
@@ -654,22 +930,29 @@
 
         function fadeOutModel(modelToFade) {
             var startTime = Date.now();
-            var duration = 300;
+            var duration = 500; // Longer duration for smoother transition
             
             function fadeStep() {
                 var elapsed = Date.now() - startTime;
                 var progress = Math.min(elapsed / duration, 1);
-                var opacity = 1 - progress;
+                
+                // Smooth easing function for fade out (ease-out)
+                var easeProgress = 1 - Math.pow(1 - progress, 3);
+                var opacity = 1 - easeProgress;
                 
                 modelToFade.traverse(function(child) {
                     if (child.material) {
                         if (Array.isArray(child.material)) {
                             child.material.forEach(function(mat) {
-                                mat.transparent = true;
+                                if (!mat.transparent) {
+                                    mat.transparent = true;
+                                }
                                 mat.opacity = opacity;
                             });
                         } else {
-                            child.material.transparent = true;
+                            if (!child.material.transparent) {
+                                child.material.transparent = true;
+                            }
                             child.material.opacity = opacity;
                         }
                     }
@@ -679,6 +962,18 @@
                     requestAnimationFrame(fadeStep);
                 } else {
                     modelToFade.visible = false;
+                    // Reset opacity for future use
+                    modelToFade.traverse(function(child) {
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(function(mat) {
+                                    mat.opacity = 1;
+                                });
+                            } else {
+                                child.material.opacity = 1;
+                            }
+                        }
+                    });
                 }
             }
             
@@ -686,24 +981,50 @@
         }
 
         function fadeInModel(modelToFade) {
+            // Set initial opacity to 0 before making visible
+            modelToFade.traverse(function(child) {
+                if (child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(function(mat) {
+                            if (!mat.transparent) {
+                                mat.transparent = true;
+                            }
+                            mat.opacity = 0;
+                        });
+                    } else {
+                        if (!child.material.transparent) {
+                            child.material.transparent = true;
+                        }
+                        child.material.opacity = 0;
+                    }
+                }
+            });
+            
             modelToFade.visible = true;
             var startTime = Date.now();
-            var duration = 300;
+            var duration = 500; // Longer duration for smoother transition
             
             function fadeStep() {
                 var elapsed = Date.now() - startTime;
                 var progress = Math.min(elapsed / duration, 1);
-                var opacity = progress;
+                
+                // Smooth easing function for fade in (ease-in)
+                var easeProgress = Math.pow(progress, 2);
+                var opacity = easeProgress;
                 
                 modelToFade.traverse(function(child) {
                     if (child.material) {
                         if (Array.isArray(child.material)) {
                             child.material.forEach(function(mat) {
-                                mat.transparent = true;
+                                if (!mat.transparent) {
+                                    mat.transparent = true;
+                                }
                                 mat.opacity = opacity;
                             });
                         } else {
-                            child.material.transparent = true;
+                            if (!child.material.transparent) {
+                                child.material.transparent = true;
+                            }
                             child.material.opacity = opacity;
                         }
                     }
@@ -711,6 +1032,19 @@
                 
                 if (progress < 1) {
                     requestAnimationFrame(fadeStep);
+                } else {
+                    // Ensure full opacity at the end
+                    modelToFade.traverse(function(child) {
+                        if (child.material) {
+                            if (Array.isArray(child.material)) {
+                                child.material.forEach(function(mat) {
+                                    mat.opacity = 1;
+                                });
+                            } else {
+                                child.material.opacity = 1;
+                            }
+                        }
+                    });
                 }
             }
             
@@ -729,7 +1063,16 @@
             // CV buttons
             document.querySelectorAll('.cv-button').forEach(function(button) {
                 button.addEventListener('mouseenter', function() {
-                    if (model && !isRotating) {
+                    if (activeModel && !isRotating) {
+                        do360Rotation();
+                    }
+                });
+            });
+            
+            // Social buttons (LinkedIn, GitHub)
+            document.querySelectorAll('.social-button').forEach(function(button) {
+                button.addEventListener('mouseenter', function() {
+                    if (activeModel && !isRotating) {
                         do360Rotation();
                     }
                 });
@@ -738,7 +1081,7 @@
             // Research link
             document.querySelectorAll('.research-link').forEach(function(link) {
                 link.addEventListener('mouseenter', function() {
-                    if (model && !isRotating) {
+                    if (activeModel && !isRotating) {
                         do360Rotation();
                     }
                 });
@@ -747,7 +1090,7 @@
             // Video Instagram button
             document.querySelectorAll('.video-instagram-button').forEach(function(button) {
                 button.addEventListener('mouseenter', function() {
-                    if (model && !isRotating) {
+                    if (activeModel && !isRotating) {
                         do360Rotation();
                     }
                 });
@@ -756,7 +1099,7 @@
             // Spotify items
             document.querySelectorAll('.spotify-item').forEach(function(item) {
                 item.addEventListener('mouseenter', function() {
-                    if (model && !isRotating) {
+                    if (activeModel && !isRotating) {
                         do360Rotation();
                     }
                 });
@@ -764,7 +1107,7 @@
         }
 
         function onDocumentMouseMove(event) {
-            if (!isRotating && model) {
+            if (!isRotating && activeModel) {
                 // Get the model container's position and dimensions
                 var containerRect = container.getBoundingClientRect();
                 var containerCenterX = containerRect.left + containerRect.width / 2;
@@ -795,7 +1138,7 @@
         }
 
         function onDocumentTouchMove(event) {
-            if (!isRotating && model && event.touches.length === 1) {
+            if (!isRotating && activeModel && event.touches.length === 1) {
                 var touch = event.touches[0];
                 
                 // Get the model container's position and dimensions
@@ -825,7 +1168,7 @@
 
         // Improved scroll-based rotation for mobile
         function onDocumentScroll() {
-            if (!isRotating && model) {
+            if (!isRotating && activeModel) {
                 var currentScrollY = window.pageYOffset || document.documentElement.scrollTop;
                 var scrollDelta = (currentScrollY % 1000) / 1000; // Normalize scroll position
                 
@@ -841,7 +1184,7 @@
 
         // Tap gesture for 360 rotation (mobile)
         function onDocumentTap(event) {
-            if (model && !isRotating && event.touches.length === 1) {
+            if (activeModel && !isRotating && event.touches.length === 1) {
                 var containerRect = container.getBoundingClientRect();
                 var touch = event.touches[0];
                 
@@ -871,14 +1214,15 @@
             var targetRotationY = startRotationY + Math.PI * 4; // 720 degrees instead of 360
             
             var modelSwitched = false;
-
+            
             // Add a bounce effect
             function rotateStep() {
                 var elapsed = Date.now() - startTime;
                 var progress = Math.min(elapsed / duration, 1);
                 
-                // Switch model at 50% progress
-                if (progress >= 0.66 && !modelSwitched) {
+                // Switch model at 50% progress for better fade timing
+                // This allows the fade to complete during the remaining rotation
+                if (progress >= 0.5 && !modelSwitched) {
                     modelSwitched = true;
                     loadNextModel();
                 }
@@ -909,7 +1253,7 @@
         function animate() {
             requestAnimationFrame(animate);
             
-            if (model && !isRotating) {
+            if (activeModel && !isRotating) {
                 // Smooth interpolation to target rotation
                 currentRotation.x += (targetRotation.x - currentRotation.x) * 0.05;
                 currentRotation.y += (targetRotation.y - currentRotation.y) * 0.05;
@@ -956,9 +1300,48 @@
             }
         }
 
+        // Track previous window width to detect mode changes
+        var previousWidth = window.innerWidth;
+        var wideModeBreakpoint = 1750; // Match the CSS breakpoint
+
+        function handleResize() {
+            var currentWidth = window.innerWidth;
+            var wasWideMode = previousWidth >= wideModeBreakpoint;
+            var isWideMode = currentWidth >= wideModeBreakpoint;
+            
+            // Check if we transitioned into wide mode
+            if (!wasWideMode && isWideMode) {
+                // Transitioned from non-wide to wide mode
+                const footer = document.getElementById('footer');
+                
+                // Reset animation state
+                footer.classList.remove('animate-footer');
+                const footerIcon = document.getElementById('footer-icon');
+                const footerText = document.getElementById('footer-text');
+                
+                footerIcon.style.animation = 'none';
+                footerText.style.animation = 'none';
+                
+                // Force a reflow
+                void footerIcon.offsetWidth;
+                
+                // Reset styles and retrigger animation
+                setTimeout(() => {
+                    footerIcon.style.animation = '';
+                    footerText.style.animation = '';
+                    
+                    // Check if footer is visible and retrigger animation
+                    checkFooterInView();
+                }, 10);
+            }
+            
+            previousWidth = currentWidth;
+        }
+
         // Add event listeners
         window.addEventListener('scroll', checkFooterInView);
         window.addEventListener('load', checkFooterInView);
+        window.addEventListener('resize', handleResize);
 
         // Also try triggering after a small delay on load
         setTimeout(checkFooterInView, 500);
